@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>May Bagyo ba?</title>
+    <link href="wither app.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+<body>
+    <style>
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    body {
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(to bottom right, #1e90ff, #00bfff);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        color: #fff;
+        overflow: hidden;
+        position: relative;
+    }
+    
+    .clouds {
+        position: absolute;
+        top: -50px;
+        left: -150px;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+        z-index: 0;
+    }
+    
+    .cloud {
+        position: absolute;
+        background: #fff;
+        border-radius: 50%;
+        opacity: 0.7;
+        animation: moveClouds 20s linear infinite;
+    }
+    
+    .cloud1 {
+        width: 250px;
+        height: 150px;
+        top: 50px;
+        left: 50px;
+    }
+    
+    .cloud2 {
+        width: 200px;
+        height: 120px;
+        top: 150px;
+        left: 300px;
+        animation-duration: 22s;
+    }
+    
+    .cloud3 {
+        width: 180px;
+        height: 110px;
+        top: 250px;
+        left: 500px;
+        animation-duration: 18s;
+    }
+    
+    .cloud4 {
+        width: 220px;
+        height: 130px;
+        top: 350px;
+        left: 150px;
+        animation-duration: 25s;
+    }
+    
+    @keyframes moveClouds {
+        from {
+            transform: translateX(-100%);
+        }
+        to {
+            transform: translateX(100%);
+        }
+    }
+    
+    .container {
+        background-color: #ffffff;
+        padding: 40px;
+        width: 100%;
+        max-width: 400px;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
+    }
+    .container:hover {
+        transform: translateY(-5px);
+    }
+    
+    h1 {
+        font-size: 28px;
+        color: #1e90ff;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+    
+    input[type="text"] {
+        padding: 14px;
+        width: 90%;
+        border: 2px solid #ccc;
+        border-radius: 12px;
+        margin-bottom: 20px;
+        font-size: 16px;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    input[type="text"]:focus {
+        border-color: #1e90ff;
+        outline: none;
+        box-shadow: 0 0 8px rgba(30, 144, 255, 0.5);
+    }
+    
+    button {
+        padding: 12px 24px;
+        background-color: #1e90ff;
+        color: white;
+        font-size: 18px;
+        font-weight: 500;
+        border: none;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+    }
+    button:hover {
+        background-color: #4682b4;
+        transform: scale(1.05);
+    }
+    
+    .weather-info {
+        margin-top: 25px;
+        font-size: 18px;
+        color: #333;
+        font-weight: 500;
+    }
+    .weather-info .temp {
+        font-size: 24px;
+        color: #1e90ff;
+        font-weight: 600;
+    }
+    .weather-info img {
+        margin-top: 15px;
+        width: 50px;
+        height: 50px;
+    }
+    
+    .error {
+        color: #ff4d4d;
+        font-size: 16px;
+        margin-top: 15px;
+        font-weight: 500;
+    }
+    
+    @media (max-width: 600px) {
+        .container {
+            padding: 25px;
+            width: 90%;
+            max-width: 350px;
+        }
+        h1 {
+            font-size: 24px;
+        }
+    }
+</style>
+</body> 
+    <div class="clouds">
+        <div class="cloud cloud1"></div>
+        <div class="cloud cloud2"></div>
+        <div class="cloud cloud3"></div>
+        <div class="cloud cloud4"></div>
+    </div>
+    
+    
+    <div class="container">
+        <h1>May Bagyo ba?</h1> 
+        <input type="text" id="city" placeholder="Enter city name">
+        <button onclick="getWeather()">Patingin nga</button>
+        <div id="weatherInfo" class="weather-info"></div>
+        <div id="errorMessage" class="error"></div>
+    </div>
+
+    <script>
+        async function getWeather() {
+            const city = document.getElementById('city').value.trim();
+            const weatherInfo = document.getElementById('weatherInfo');
+            const errorMessage = document.getElementById('errorMessage');
+            
+            weatherInfo.innerHTML = '';
+            errorMessage.innerText = '';
+
+            if (!city) {
+                errorMessage.innerText = 'Please enter a city name.';
+                return;
+            }
+
+            const apiKey = '39738afd149c408f79e98c8cd60116fe';
+            try {
+                const response = await fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`);
+                
+                if (!response.ok) {
+                    throw new Error('City not found');
+                }
+                
+                const data = await response.json();
+                const temp = data.main.temp;
+                const description = data.weather[0].description;
+                const iconCode = data.weather[0].icon;
+                
+                weatherInfo.innerHTML = `
+                    <div class="temp">🌡️ ${temp}°C</div>
+                    <div>${description.charAt(0).toUpperCase() + description.slice(1)}</div>
+                    <img src="https://openweathermap.org/img/wn/${iconCode}@2x.png" alt="Weather icon">
+                `;
+            } catch (error) {
+                errorMessage.innerText = error.message || 'An error occurred. Please try again.';
+            }
+        }
+    </script>
+</body>
+</html>
